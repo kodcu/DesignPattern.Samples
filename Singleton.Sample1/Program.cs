@@ -10,11 +10,16 @@ namespace Singleton.Sample1
     {
         static void Main(string[] args)
         {
-            var myObject = Singleton.Instance();
+            var myFirstObject = Singleton.Instance();
+            var mySecondObject = Singleton.Instance();
+            var myThirdObject = Singleton.Instance();
+            //var myFourthObject = new Singleton(); 
 
-            Console.WriteLine(myObject.DoSomething());
-            Console.WriteLine(myObject.DoSomething());
-            Console.WriteLine(myObject.DoSomething());
+            if(myFirstObject == mySecondObject)
+                Console.WriteLine("Nesneler aynı");
+
+            if(mySecondObject != myThirdObject)
+                Console.WriteLine("Nesneler aynı değil");
 
             Console.ReadLine();
         }
@@ -28,7 +33,7 @@ namespace Singleton.Sample1
         // private da kullanabilirdir.
         protected Singleton()
         {
-
+            Console.WriteLine("Nesne oluşturuluyor...");
         }
 
         public static Singleton Instance()
@@ -38,11 +43,6 @@ namespace Singleton.Sample1
                 _instance = new Singleton();
 
             return _instance;
-        }
-
-        public string DoSomething()
-        {
-            return _instance.GetHashCode().ToString();
         }
     }
 }

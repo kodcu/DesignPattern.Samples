@@ -9,7 +9,16 @@ namespace Singleton.Sample3
     class Program
     {
         static void Main(string[] args)
-        {                        
+        {
+            TestClass c0 = Singleton<TestClass>.UniqueInstanse;
+            TestClass c1 = Singleton<TestClass>.UniqueInstanse;
+            TestClass c2 = Singleton<TestClass>.UniqueInstanse;
+
+            if (c0.Equals(c1))
+                Console.WriteLine("Aynı nesneler");
+
+            if (!c1.Equals(c2))
+                Console.WriteLine("Aynı nesne değiller");
 
             Console.ReadLine();
         }
@@ -44,8 +53,7 @@ namespace Singleton.Sample3
             get { return SingletonCreator.instance; }
         }
     }
-
-
+}
 
 
     // başka bir örnek kod
@@ -75,4 +83,4 @@ namespace Singleton.Sample3
             return Activator.CreateInstance(typeof(T), true) as T;
         }
     }
-}
+
