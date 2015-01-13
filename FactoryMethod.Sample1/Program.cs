@@ -95,4 +95,16 @@ namespace FactoryMethod.Sample1
             return opr = new T();
         }
     }
+
+
+    // başka bir örnek tasarım
+    // Generic Factory 
+    public class GlobalFactory
+    {
+        public T Create<T>() where T : class
+        {
+            var type = typeof(T);
+            return Activator.CreateInstance(type) as T;
+        }
+    }
 }

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.OracleClient;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,141 +13,119 @@ namespace FactoryMethod.Sample2
     {
         static void Main(string[] args)
         {
-            // Note: constructors call Factory Method
-            Document[] documents = new Document[2];
+           // normal kullanım
+            PDFReader pdfreader = new PDFReader();
+            pdfreader.Read();
+            pdfreader.Extract();
 
-            documents[0] = new Resume();
-            documents[1] = new Report();
+            // 1. kullanım
+            DocumentReaderFactory readerFac = new DocumentReaderFactory();
+            PDFReader pdfReader = (PDFReader)readerFac.Get("PDF");
+            pdfReader.Read();
+            pdfReader.Extract();
 
-            // Display document pages
-            foreach (Document document in documents)
-            {
-                Console.WriteLine();
-                Console.WriteLine(document.GetType().Name + "--");
-                foreach (Page page in document.Pages)
-                {
-                    Console.WriteLine(" " + page.GetType().Name);
-                }
-            }
+            // 2. kullanım
+            PDFReaaderFactory pdfFactory = new PDFReaaderFactory();
+            PDFReader pdfReader2 = (PDFReader)pdfFactory.CreateReader();
+            pdfReader2.Read();
+            pdfReader2.Extract();
+
+            //3. kullanım
+            DocumentProcessor pro = new DocumentProcessor();
+            pro.Process(new PDFReaaderFactory());
+            
 
             Console.ReadLine();
         }
     }
 
-    /// <summary>
-    /// The 'Product' abstract class
-    /// </summary>
-    abstract class Page
+    public interface IDocumentReader
     {
-
+        void Read();
+        void Extract();
     }
 
-    // <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class SkillsPage : Page
+    public class PDFReader
+        : IDocumentReader
     {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class EducationPage : Page
-    {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class ExperiencePage : Page
-    {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class IntroductionPage : Page
-    {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class ResultsPage : Page
-    {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class ConclusionPage : Page
-    {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class SummaryPage : Page
-    {
-    }
-
-    /// <summary>
-    /// A 'ConcreteProduct' class
-    /// </summary>
-    class BibliographyPage : Page
-    {
-    }
-
-
-    /// <summary>
-    /// The 'Creator' abstract class
-    /// </summary>
-    abstract class Document
-    {
-        private List<Page> _pages = new List<Page>();
-
-        // Constructor calls abstract Factory method
-        public Document()
+        public void Read()
         {
-            this.CreatePages();
+            throw new NotImplementedException();
         }
 
-        public List<Page> Pages
+        public void Extract()
         {
-            get { return _pages; }
-        }
-
-        // Factory Method
-        public abstract void CreatePages();
-    }
-
-    /// <summary>
-    /// A 'ConcreteCreator' class
-    /// </summary>
-    class Resume : Document
-    {
-        // Factory Method implementation
-        public override void CreatePages()
-        {
-            Pages.Add(new SkillsPage());
-            Pages.Add(new EducationPage());
-            Pages.Add(new ExperiencePage());
+            throw new NotImplementedException();
         }
     }
 
-    /// <summary>
-    /// A 'ConcreteCreator' class
-    /// </summary>
-    class Report : Document
+    public class MsWordReader
+        : IDocumentReader
     {
-        // Factory Method implementation
-        public override void CreatePages()
+        public void Read()
         {
-            Pages.Add(new IntroductionPage());
-            Pages.Add(new ResultsPage());
-            Pages.Add(new ConclusionPage());
-            Pages.Add(new SummaryPage());
-            Pages.Add(new BibliographyPage());
+            throw new NotImplementedException();
+        }
+
+        public void Extract()
+        {
+            throw new NotImplementedException();
         }
     }
+    
+    // 1
+    public class DocumentReaderFactory
+    {
+        // burada string tipi enum da kullanabiliriz.
+        public IDocumentReader Get(string readerType)
+        {
+            switch (readerType)
+            {
+                case "PDF":
+                    return new PDFReader();
+                case "MsWord":
+                    return new MsWordReader();
+                default:
+                    return new PDFReader(); 
+                // örneğin burası için NULL object deseni kullanılarak nul tanımlı bir sınıf yazılabilir.   
+                // veya exception fırlatılır throw new Exception("Invalid DocumentReader type");
+            }
+        }
+    }
+
+    // 2
+    public interface IDocumentReaderFactory
+    {
+        IDocumentReader CreateReader();
+    }
+
+    public class PDFReaaderFactory
+        : IDocumentReaderFactory
+    {
+
+        public IDocumentReader CreateReader()
+        {
+            return new PDFReader();
+        }
+    }
+
+    public class MsWordReaderFactory
+        : IDocumentReaderFactory
+    {
+        public IDocumentReader CreateReader()
+        {
+            return new MsWordReader();
+        }
+    }
+
+    public class DocumentProcessor
+    {
+        public void Process(IDocumentReaderFactory factory)
+        {
+            IDocumentReader reader = factory.CreateReader();
+            reader.Read();
+            reader.Extract();
+        }
+    }
+
 }
