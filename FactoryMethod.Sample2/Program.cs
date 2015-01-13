@@ -20,14 +20,14 @@ namespace FactoryMethod.Sample2
 
             // 1. kullanım
             DocumentReaderFactory readerFac = new DocumentReaderFactory();
-            PDFReader pdfReader = (PDFReader)readerFac.Get("PDF");
+            IDocumentReader pdfReader = (PDFReader)readerFac.Get("PDF");
             pdfReader.Read();
             pdfReader.Extract();
 
             // 1.1 generic version
 
-            PDFReader pdfReader1 = (PDFReader)DocumentFactory<PDFReader>.Get();
-            MsWordReader wordReader1 = (MsWordReader)DocumentFactory<MsWordReader>.Get(); 
+            IDocumentReader pdfReader1 = (PDFReader)DocumentFactory<PDFReader>.Get();
+            IDocumentReader wordReader1 = (MsWordReader)DocumentFactory<MsWordReader>.Get(); 
 
             Console.ReadLine();
         }
