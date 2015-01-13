@@ -36,14 +36,12 @@ namespace FactoryMethod.Sample3
         public void Process(ITextProcessorFactory readerFactory)
         {
             ITextProcessor reader = readerFactory.CreateProcessor();
-            var text = reader.ReadText();
-            
-           
+            var text = reader.ReadText();           
         }
     }
 
 
-    interface ITextProcessorFactory
+    public interface ITextProcessorFactory
     {
         ITextProcessor CreateProcessor();
     }
@@ -74,7 +72,7 @@ namespace FactoryMethod.Sample3
 
 
 
-    interface ITextProcessor
+    public interface ITextProcessor
     {
         string ReadText();
         void SaveText(string processedText);

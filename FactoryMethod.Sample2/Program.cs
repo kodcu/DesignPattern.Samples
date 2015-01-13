@@ -24,16 +24,10 @@ namespace FactoryMethod.Sample2
             pdfReader.Read();
             pdfReader.Extract();
 
-            // 2. kullanım
-            PDFReaaderFactory pdfFactory = new PDFReaaderFactory();
-            PDFReader pdfReader2 = (PDFReader)pdfFactory.CreateReader();
-            pdfReader2.Read();
-            pdfReader2.Extract();
+            // 1.1 generic version
 
-            //3. kullanım
-            DocumentProcessor pro = new DocumentProcessor();
-            pro.Process(new PDFReaaderFactory());
-            
+            PDFReader pdfReader1 = (PDFReader)DocumentFactory<PDFReader>.Get();
+            MsWordReader wordReader1 = (MsWordReader)DocumentFactory<MsWordReader>.Get(); 
 
             Console.ReadLine();
         }
@@ -93,39 +87,16 @@ namespace FactoryMethod.Sample2
         }
     }
 
-    // 2
-    public interface IDocumentReaderFactory
+    // 1.1 generic version
+    class DocumentFactory<T>
+        where T : IDocumentReader, new()
     {
-        IDocumentReader CreateReader();
-    }
+        private static IDocumentReader opr = null;
 
-    public class PDFReaaderFactory
-        : IDocumentReaderFactory
-    {
-
-        public IDocumentReader CreateReader()
+        public static IDocumentReader Get()
         {
-            return new PDFReader();
+            return opr = new T();
         }
-    }
-
-    public class MsWordReaderFactory
-        : IDocumentReaderFactory
-    {
-        public IDocumentReader CreateReader()
-        {
-            return new MsWordReader();
-        }
-    }
-
-    public class DocumentProcessor
-    {
-        public void Process(IDocumentReaderFactory factory)
-        {
-            IDocumentReader reader = factory.CreateReader();
-            reader.Read();
-            reader.Extract();
-        }
-    }
+    }    
 
 }

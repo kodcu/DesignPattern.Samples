@@ -80,6 +80,7 @@ namespace FactoryMethod.Sample4
     }
 
     // factory tasarımı
+    // sınıfların sonekini creator olarak da isimlendirebiliriz
     public interface IAccountingFactory
     {
         BaseAccounting Create();
@@ -88,18 +89,34 @@ namespace FactoryMethod.Sample4
     public class ForeignAccountingFactory
         : IAccountingFactory
     {
+        private ForeignAccounting ForeignAccounting
+        {
+            get
+            {
+                return new ForeignAccounting();
+            }
+        }
+    
         public BaseAccounting Create()
         {
-            return new ForeignAccounting();
+            return ForeignAccounting;
         }
     }
 
     public class DomesticAccountingFactory
         : IAccountingFactory
     {
+        private DomestricAccounting DomestricAccounting
+        {
+            get
+            {
+                return new DomestricAccounting();
+            }
+        }
+    
         public BaseAccounting Create()
         {
-            return new DomestricAccounting();
+            return DomestricAccounting;
         }
     }
 
