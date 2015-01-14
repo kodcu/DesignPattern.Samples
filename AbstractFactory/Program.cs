@@ -10,78 +10,130 @@ namespace AbstractFactory.Sample4
     {
         static void Main(string[] args)
         {
-            FileFactory factory0 = new XmlFactory();
-            factory0.Parser();
-            factory0.Validator();
+            // doğrudan fabrika sınıflarını kullanmak
+            ReportFactory excelReport = new ExcelReportFactory();
+            excelReport.Connector();
+            excelReport.Formatter();
+            excelReport.Writer();
 
-            FileFactory factory1 = new PdfFactory();
-            factory1.Parser();
-            factory1.Validator();
+            ReportFactory pdfReport = new PdfReportFactory();
+            pdfReport.Connector();
+            pdfReport.Formatter();
+            pdfReport.Writer();
+
+            // fabrika sınıflarını kullanan genel bir sınıf
+            ReportGenerator.Current.Generate(new PdfReportFactory());
 
             Console.ReadLine();
         }
     }
 
-
-    abstract class Parser { }
-    abstract class Validator { }
-
-    public class XmlParser
-        : Parser 
+    // Abstarct Factory
+    public abstract class ReportFactory
     {
+        public abstract ReportConnector Connector();
+        public abstract ReportFormatter Formatter();
+        public abstract ReportWriter Writer();
+    }
+
+    public class ExcelReportFactory
+        : ReportFactory
+    {
+        public override ReportConnector Connector()
+        {
+            return new ExcelReportConnector();
+        }
+
+        public override ReportFormatter Formatter()
+        {
+            return new ExcelReportFormatter();
+        }
+
+        public override ReportWriter Writer()
+        {
+            return new ExcelReportWriter();
+        }
+    }
+
+    public class PdfReportFactory
+        : ReportFactory
+    {
+
+        public override ReportConnector Connector()
+        {
+            // nesneler concrete fabrika sınıflarında yaratılır.
+            return new PdfReportConnector();
+        }
+
+        public override ReportFormatter Formatter()
+        {
+            return new PdfReportFormatter();
+        }
+
+        public override ReportWriter Writer()
+        {
+            return new PdfReportWriter();
+        }
+    }
+
+    // fabrika sınıflarını kullanan basit bir istemci kod blogu
+    // bu sınıfı singleton tasarladım. 
+    public class ReportGenerator
+    {
+           
+        private static ReportGenerator _current = null;
+        private static object _lockObj = new object();
+
+        public static ReportGenerator Current
+        {
+            get
+            {
+                if (_current == null)
+                {
+                    lock (_lockObj)
+                    {
+                        if (_current == null)
+                        {
+                            _current = new ReportGenerator();
+                        }
+                    }
+                }
+
+                return _current;
+            }
+        }
         
-    }
-
-    public class XmlValidator
-        : Validator
-    {
-
-    }
-
-    public class PdfParser
-        : Parser 
-    {
+        private ReportGenerator() { }
         
-    }
-
-    public class PdfValidator
-        : Validator 
-    {
-    
-    }
-
-
-    public abstract class FileFactory
-    {
-        public abstract Parser Parser();
-        public abstract Validator Validator();
-    }
-
-    public class XmlFactory
-        : FileFactory
-    {
-        public override Parser Parser()
+        // factory kullanımı
+        public void Generate(ReportFactory reportFac)
         {
-            throw new NotImplementedException();
-        }
-
-        public override Validator Validator()
-        {
-            throw new NotImplementedException();
+            ReportConnector conn = reportFac.Connector();
+            ReportFormatter formatter = reportFac.Formatter();
+            ReportWriter writer = reportFac.Writer();
         }
     }
 
-    public class PdfFactory
-        : FileFactory
-    {
-        public override Parser Parser()
-        {
-            throw new NotImplementedException();
-        }
 
-        public override Validator Validator()
+    // another version with delegate
+    public delegate ReportConnector CreateReportConnectorDelegate();
+    public delegate ReportFormatter CreateReportFormatterDelegate();
+    public delegate ReportWriter CreateReportWriterDelegate();
+
+    public class ReportFactory
+    {
+        public CreateReportConnectorDelegate CreateReportConnector { get; set; }
+        public CreateReportFormatterDelegate CreateReportFormatter { get; set; }
+        public CreateReportWriterDelegate CreateReportWriter { get; set; }
+
+
+        public ReportFactory()
         {
-            throw new NotImplementedException();
+            this.CreateReportConnector = new CreateReportConnectorDelegate(delegate { return new ExcelReportConnector(); });
+            this.CreateReportFormatter = new CreateReportFormatterDelegate(delegate { return new ExcelReportFormatter(); });
+            this.CreateReportWriter = new CreateReportWriterDelegate(delegate { return new ExcelReportWriter(); });
+
+            //******
         }
     }
 
