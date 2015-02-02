@@ -12,10 +12,16 @@ namespace ObjectPool.Sample3
         {
             QueuedPool<Person> queuePool = new QueuedPool<Person>();
             queuePool.Store(new Person());
-
+            
             Person p = queuePool.Fetch();
 
             Person d = queuePool.Fetch();
+
+            Person c = queuePool.Fetch();
+
+            Person s = queuePool.Fetch();
+
+            Person e = queuePool.Fetch();
 
             Console.ReadKey();
         }
